@@ -43,8 +43,7 @@
 	QDEL_NULL(bloodstr)
 	QDEL_NULL(dna)
 	QDEL_NULL(breathing)
-	for(var/guts in internal_organs)
-		qdel(guts)
+	QDEL_NULL_LIST(internal_organs)
 	return ..()
 
 /mob/living/carbon/rejuvenate()

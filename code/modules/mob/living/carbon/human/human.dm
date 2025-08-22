@@ -111,7 +111,7 @@
 
 	GLOB.human_mob_list -= src
 	GLOB.intent_listener -= src
-	QDEL_LIST(organs)
+	QDEL_NULL_LIST(organs)
 	internal_organs_by_name = null
 	internal_organs = null
 	organs_by_name = null
