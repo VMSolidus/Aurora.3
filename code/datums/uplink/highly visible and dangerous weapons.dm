@@ -271,7 +271,7 @@
 	path = /obj/item/gun/projectile/deagle/adhomai
 
 /datum/uplink_item/item/visible_weapons/psionic_jumpstarter
-	name = "Psionic Jumpstarter"
+	name = "Psionic Jumpstarter (Harmonious)"
 	telecrystal_cost = 19
 	path = /obj/item/psionic_jumpstarter
 
@@ -280,3 +280,14 @@
 	desc = "A flamethrower, with a full canister of Phoron installed to fuel it. Handle with caution."
 	telecrystal_cost = 10
 	path = /obj/item/flamethrower/full
+
+/datum/uplink_item/item/visible_weapons/psionic_jumpstarter_minor
+	name = "Psionic Jumpstarter (Sensitive)"
+	telecrystal_cost = 5
+	bluecrystal_cost = 5
+	path = /obj/item/psionic_jumpstarter_minor
+
+/datum/uplink_item/item/visible_weapons/psionic_jumpstarter_greater
+	name = "Psionic Jumpstarter (Apex)"
+	telecrystal_cost = 35
+	path = /obj/item/psionic_jumpstarter_greater

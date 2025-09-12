@@ -127,10 +127,12 @@
 /obj/item/psionic_jumpstarter
 	name = "psionic jumpstarter"
 	desc = "Use this to jumpstart your psionic rank to Psionically Harmonious, enabling you to use the Psionic Point Shop and buy offensive psionic abilities. \
-			This won't work on species with no Zona Bovinae, like synthetics, vaurcae or dionae! This item is definitely not canon."
+			This won't work on species with no natural or artificial Zona Bovinae! This item is definitely not canon."
 	icon = 'icons/obj/clothing/hats.dmi'
 	icon_state = "amp"
 	contained_sprite = FALSE
+	var/psi_rank_to_set = PSI_RANK_HARMONIOUS
+	var/bonus_psi_points = 8
 
 /obj/item/psionic_jumpstarter/attack_self(mob/user)
 	. = ..()
@@ -141,11 +143,23 @@
 		to_chat(H, SPAN_WARNING("You don't have a Zona Bovinae!"))
 		return
 
-	if(H.psi && H.psi.get_rank() >= PSI_RANK_HARMONIOUS)
+	if(H.psi && H.psi.get_rank() >= psi_rank_to_set)
 		to_chat(H, SPAN_WARNING("You've already awakened your psionic potential!"))
 		return
 
-	H.set_psi_rank(PSI_RANK_HARMONIOUS)
-	H.psi.psi_points = 8
+	H.set_psi_rank(psi_rank_to_set)
+	H.psi.psi_points = bonus_psi_points
 	to_chat(H, SPAN_NOTICE("You've awakened your psionic potential. Note that you have a reduced point pool than usual."))
 	qdel(src)
+
+/obj/item/psionic_jumpstarter/minor
+	desc = "Use this to jumpstart your psionic rank to Psionically Sensitive, enabling you to use the Psionic Point Shop and buy common psionic abilities. \
+			This won't work on species with no natural or artificial Zona Bovinae! This item is definitely not canon."
+	psi_rank_to_set = PSI_RANK_SENSITIVE
+	bonus_psi_points = 2
+
+/obj/item/psionic_jumpstarter/greater
+	desc = "Use this to jumpstart your psionic rank to Apex, enabling you to use the Psionic Point Shop and buy offensive psionic abilities \
+			This won't work on species with no natural or artificial Zona Bovinae! This item is definitely not canon."
+	psi_rank_to_set = PSI_RANK_APEX
+	bonus_psi_points = 10
