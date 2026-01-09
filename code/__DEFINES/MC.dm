@@ -28,7 +28,13 @@
 
 #define NEW_SS_GLOBAL(varname) if(varname != src){if(istype(varname)){Recover();qdel(varname);}varname = src;}
 
+/// Schedules a Datum for processing if it was not already doing so, otherwise does nothing.
 #define START_PROCESSING(Processor, Datum) if (!(Datum.datum_flags & DF_ISPROCESSING)) {Datum.datum_flags |= DF_ISPROCESSING;Processor.processing += Datum}
+
+/**
+ * Schedules a Datum to stop processing on the next tick, freeing up CPU resources.
+ * Consider using this aggressively and often in guard clauses as-appropriate to ensure performance.
+ */
 #define STOP_PROCESSING(Processor, Datum) Datum.datum_flags &= ~DF_ISPROCESSING;Processor.processing -= Datum;Processor.currentrun -= Datum
 
 /// Returns true if the MC is initialized and running.

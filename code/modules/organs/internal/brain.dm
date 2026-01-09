@@ -170,8 +170,14 @@
 	damage_threshold_value = round(max_damage / damage_threshold_count)
 
 /obj/item/organ/internal/brain/process(seconds_per_tick)
+	. = ..()
+	// Stop processing brains that are placed in an MMI
+	if(istype(loc,/obj/item/device/mmi))
+		STOP_PROCESSING(SSprocessing, src)
+		return
+
 	if(!owner)
-		return ..()
+		return
 
 	if(damage > (max_damage * 0.75) && healed_threshold)
 		handle_severe_brain_damage()
@@ -183,7 +189,7 @@
 
 	// Brain damage from low oxygenation or lack of blood.
 	if(!owner.should_have_organ(BP_HEART))
-		return ..()
+		return
 
 	// Adjust the rate of brain healing and damage over time if the owner is in stasis.
 	if(owner.stasis_value > 0)
@@ -237,7 +243,6 @@
 			owner.eye_blurry = max(owner.eye_blurry,6)
 			dammod = owner.chem_effects[CE_STABLE] ? dying_stabilized_mod : dying_unstable_mod
 			take_internal_damage(brain_damage_amount * dammod * dying_damage_modifier)
-	..()
 
 /obj/item/organ/internal/brain/proc/handle_severe_brain_damage()
 	set waitfor = FALSE

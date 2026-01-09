@@ -47,6 +47,12 @@
 	var/force_skintone = FALSE		// If true, icon generation will skip is-robotic checks. Used for synthskin limbs.
 	var/list/species_restricted //used by augments and biomods to see what species can have this augment
 
+	/**
+	 * The amount of time (in real-world seconds) this organ has spent in a corpse that isn't also preserved via stasis.
+	 * This is used for tracking organ rotting for donation/harvesting.
+	 */
+	var/time_in_corpse
+
 INITIALIZE_IMMEDIATE(/obj/item/organ)
 
 /obj/item/organ/Initialize(mapload, internal)
@@ -117,9 +123,8 @@ INITIALIZE_IMMEDIATE(/obj/item/organ)
 			blood_DNA.Cut()
 			blood_DNA[dna.unique_enzymes] = dna.b_type
 
+/// Sets the organ's damage and flags as dead, and also stops processing on the organ to save server resources.
 /obj/item/organ/proc/die()
-	if(status & ORGAN_ROBOT)
-		return
 	damage = max_damage
 	status |= ORGAN_DEAD
 	death_time = world.time
@@ -146,14 +151,22 @@ INITIALIZE_IMMEDIATE(/obj/item/organ)
 		STOP_PROCESSING(SSprocessing, src)
 		return
 
-	//dead already, no need for more processing
+	// No need to process dead organs.
 	if(status & ORGAN_DEAD)
+		STOP_PROCESSING(SSprocessing, src)
 		return
-	// Don't process if we're in a freezer, an MMI or a stasis bag.or a freezer or something I dunno
-	if(istype(loc,/obj/item/device/mmi))
+
+	// Exit early if we're in a freezer, basically to prevent organ decay.
+	if(istype(loc,/obj/structure/closet/crate/freezer) || istype(loc,/obj/item/storage/box/unique/freezer))
 		return
-	if(istype(loc,/obj/structure/closet/body_bag/cryobag) || istype(loc,/obj/structure/closet/crate/freezer) || istype(loc,/obj/item/storage/box/unique/freezer))
-		return
+
+	// Kill processing if the organ is in a corpse for more than 5 minutes. We'll assume the organ died with its owner.
+	if(owner & owner.stat == DEAD)
+		time_in_corpse += seconds_per_tick / (owner.stasis_value != 0 ? owner.stasis_value : 1)
+		if (time_in_corpse >= ORGAN_RECOVERY_THRESHOLD)
+			die()
+			return
+
 	//Process infections
 	if ((status & ORGAN_ROBOT) || (owner && owner.species && (owner.species.flags & IS_PLANT)))
 		germ_level = 0
@@ -473,6 +486,13 @@ INITIALIZE_IMMEDIATE(/obj/item/organ)
 	forceMove(owner) //just in case
 	if(BP_IS_ROBOTIC(src))
 		set_dna(owner.dna)
+
+	// It's possible that target (and by extension owner) can be null in this context.
+	if(owner)
+		// Ensure the organ is processing for at least one tick if for whatever reason it wasn't before.
+		// The organ will recheck all its usual STOP_PROCESSING() conditions on the next tick. IE: "Am I dead?"
+		// Plus this does nothing anyways if the organ was already processing.
+		START_PROCESSING(SSprocessing, src)
 	return 1
 
 /obj/item/organ/internal/eyes/replaced(var/mob/living/carbon/human/target)

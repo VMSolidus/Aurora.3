@@ -63,3 +63,9 @@
 
 /// Sent when a full endoskeleton repair is done. Unlike the normal one, also restores max_damage to initial state. No extra arguments.
 #define COMSIG_SYNTH_ENDOSKELETON_FULL_REPAIR "synth_endoskeleton_full_repair"
+
+/**
+ * Raised on an entity that is taking in air from its environment.
+ * Called during get_breath_from_environment()
+ */
+#define COMSIG_LUNG_FILTER_EVENT "lung_filter_event"
